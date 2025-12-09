@@ -30,7 +30,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
 } from "@mui/icons-material";
-import RichTextInput from "../../components/RichTextInput";
+import RichTextInput from "../../components/RichTextInput/RichTextInput";
 
 // Edit view for Pages
 const statusChoices = [

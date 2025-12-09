@@ -82,10 +82,10 @@ export interface ImageFilters {
 export interface MenuItem {
   id: string;
   label: string;
-  linkType: "internal" | "external";
-  pageId?: number;
-  url?: string;
-  icon?: string;
+  linkType: "internal" | "external" | "none";
+  pageId?: number | null;
+  url?: string | null;
+  icon?: string | null;
   openInNewTab: boolean;
   showInMobile: boolean;
   children?: MenuItem[];
@@ -99,7 +99,7 @@ export interface Menu {
 
 export interface AddMenuItemInput {
   label: string;
-  linkType: "internal" | "external";
+  linkType: "internal" | "external" | "none";
   pageId?: number;
   url?: string;
   icon?: string;

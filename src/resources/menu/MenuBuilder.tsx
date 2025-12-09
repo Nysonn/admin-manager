@@ -270,7 +270,7 @@ const MenuBuilder: React.FC = () => {
     try {
       await updateMenuMutation.mutateAsync({
         id: 1,
-        items: menuItems,
+        items: menuItems as any,
       });
       setOriginalMenu(deepClone(menuItems));
       showSnackbar("Menu saved successfully!", "success");

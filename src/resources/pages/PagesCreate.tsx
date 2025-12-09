@@ -26,7 +26,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import InfoIcon from "@mui/icons-material/Info";
-import RichTextInput from "../../components/RichTextInput";
+import RichTextInput from "../../components/RichTextInput/RichTextInput";
 import slugify from "../../utils/slugify";
 
 const statusChoices = [

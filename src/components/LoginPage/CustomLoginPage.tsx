@@ -1,4 +1,3 @@
-import React from 'react';
 import { Login, LoginForm } from 'react-admin';
 import { TextInput, required } from 'react-admin';
 

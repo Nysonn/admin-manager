@@ -1,40 +1,22 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  AppBar,
-  Toolbar,
-  Typography,
-  Container,
   Paper,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Collapse,
-  IconButton,
   Drawer,
   useTheme,
   useMediaQuery,
-  Chip,
-  alpha,
-  Stack,
-  Divider,
   CircularProgress,
   Alert,
+  Container,
 } from "@mui/material";
-import {
-  ExpandLess,
-  ExpandMore,
-  Menu as MenuIcon,
-  Close as CloseIcon,
-  OpenInNew,
-  ArrowBack,
-} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useMenu } from "../hooks/useMenu";
+import { MenuSidebar } from "../components/MenuPreview/MenuSidebar";
+import { MenuPreviewHeader } from "../components/MenuPreview/MenuPreviewHeader";
+import { MenuPreviewContent } from "../components/MenuPreview/MenuPreviewContent";
 
-type LinkType = "internal" | "external" | "none";
-
+// Export types used in child components
+export type LinkType = "internal" | "external" | "none";
 export type MenuItemType = {
   id: string;
   label: string;
@@ -47,22 +29,26 @@ export type MenuItemType = {
   children?: MenuItemType[];
 };
 
+
 const MenuPreview: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
-  const { data: menuData, isLoading: loading, error } = useMenu(1);
+  
+  // Data Fetching & State
+  const { data: menuData, isLoading, error } = useMenu(1);
   const [menuItems, setMenuItems] = useState<MenuItemType[]>([]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
-  // Update menu items when data loads
+  // Effect to sync fetched data
   useEffect(() => {
     if (menuData?.items) {
       setMenuItems(menuData.items);
     }
   }, [menuData]);
 
+  // Logic Handlers
   const toggleExpand = (id: string) => {
     setExpandedItems((prev) => {
       const newSet = new Set(prev);
@@ -89,6 +75,7 @@ const MenuPreview: React.FC = () => {
     return "#";
   };
 
+  // Function to handle link navigation/expansion
   const handleMenuClick = (item: MenuItemType) => {
     if (item.linkType === "none" && item.children && item.children.length > 0) {
       toggleExpand(item.id);
@@ -102,102 +89,26 @@ const MenuPreview: React.FC = () => {
     }
   };
 
-  const renderMenuItem = (item: MenuItemType, level = 0) => {
-    const hasChildren = item.children && item.children.length > 0;
-    const isExpanded = expandedItems.has(item.id);
-    const isParent = item.linkType === "none";
-
-    if (isMobile && !item.showInMobile) {
-      return null;
-    }
-
-    return (
-      <React.Fragment key={item.id}>
-        <ListItem
-          disablePadding
-          sx={{
-            pl: level * 2,
-            borderLeft: level > 0 ? `2px solid ${theme.palette.divider}` : "none",
-            ml: level > 0 ? 1 : 0,
-          }}
-        >
-          <ListItemButton
-            onClick={() => handleMenuClick(item)}
-            sx={{
-              borderRadius: 1,
-              mx: 0.5,
-              my: 0.25,
-              "&:hover": {
-                backgroundColor: alpha(theme.palette.primary.main, 0.1),
-              },
-            }}
-          >
-            <ListItemText
-              primary={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography
-                    variant={level === 0 ? "subtitle1" : "body2"}
-                    fontWeight={level === 0 ? 600 : 500}
-                  >
-                    {item.label}
-                  </Typography>
-                  {item.openInNewTab && item.linkType === "external" && (
-                    <OpenInNew sx={{ fontSize: 14, color: "text.secondary" }} />
-                  )}
-                  {isParent && (
-                    <Chip
-                      label="Parent"
-                      size="small"
-                      sx={{
-                        height: 18,
-                        fontSize: "0.65rem",
-                        backgroundColor: alpha(theme.palette.info.main, 0.1),
-                        color: "info.main",
-                      }}
-                    />
-                  )}
-                </Box>
-              }
-            />
-            {hasChildren && (isExpanded ? <ExpandLess /> : <ExpandMore />)}
-          </ListItemButton>
-        </ListItem>
-        {hasChildren && (
-          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {item.children!.map((child) => renderMenuItem(child, level + 1))}
-            </List>
-          </Collapse>
-        )}
-      </React.Fragment>
-    );
+  const handleGoBack = () => {
+    navigate("/menu");
   };
 
-  const menuContent = (
-    <Box sx={{ py: 2 }}>
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <List>
-          {menuItems.length === 0 ? (
-            <ListItem>
-              <ListItemText
-                primary="No menu items"
-                secondary="Configure your menu in the admin panel"
-              />
-            </ListItem>
-          ) : (
-            menuItems.map((item) => renderMenuItem(item))
-          )}
-        </List>
-      )}
-    </Box>
-  );
+  // Filter items for mobile view based on showInMobile flag (including recursive filter)
+  const filterMobileItems = (items: MenuItemType[]): MenuItemType[] => {
+    return items
+      .filter(item => !isMobile || item.showInMobile)
+      .map(item => ({
+        ...item,
+        children: item.children ? filterMobileItems(item.children) : undefined,
+      }));
+  };
+  
+  const mobileVisibleItems = filterMobileItems(menuItems);
 
-  // Loading state
-  if (loading) {
+
+  // --- Render State Checks ---
+
+  if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
         <CircularProgress />
@@ -205,25 +116,10 @@ const MenuPreview: React.FC = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <AppBar position="sticky" elevation={1}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              edge="start"
-              onClick={() => navigate("/menu")}
-              sx={{ mr: 2 }}
-            >
-              <ArrowBack />
-            </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Menu Preview
-            </Typography>
-          </Toolbar>
-        </AppBar>
+        <MenuPreviewHeader mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} onGoBack={handleGoBack} />
         <Container sx={{ mt: 4 }}>
           <Alert severity="error">Failed to load menu. Please try again.</Alert>
         </Container>
@@ -233,34 +129,15 @@ const MenuPreview: React.FC = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      {/* AppBar */}
-      <AppBar position="sticky" elevation={1}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={() => navigate("/menu")}
-            sx={{ mr: 2 }}
-          >
-            <ArrowBack />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Menu Preview
-          </Typography>
-          {isMobile && (
-            <IconButton
-              color="inherit"
-              edge="end"
-              onClick={handleDrawerToggle}
-            >
-              {mobileOpen ? <CloseIcon /> : <MenuIcon />}
-            </IconButton>
-          )}
-        </Toolbar>
-      </AppBar>
+      {/* 1. Header */}
+      <MenuPreviewHeader 
+        mobileOpen={mobileOpen} 
+        handleDrawerToggle={handleDrawerToggle} 
+        onGoBack={handleGoBack} 
+      />
 
       <Box sx={{ display: "flex", flex: 1 }}>
-        {/* Desktop Sidebar */}
+        {/* 2. Desktop Sidebar */}
         {!isMobile && (
           <Paper
             elevation={2}
@@ -271,11 +148,18 @@ const MenuPreview: React.FC = () => {
               overflow: "auto",
             }}
           >
-            {menuContent}
+            {/* Pass the full menu structure for desktop */}
+            <MenuSidebar
+              menuItems={menuItems} 
+              isLoading={isLoading}
+              expandedItems={expandedItems}
+              toggleExpand={toggleExpand}
+              handleMenuClick={handleMenuClick}
+            />
           </Paper>
         )}
 
-        {/* Mobile Drawer */}
+        {/* 3. Mobile Drawer */}
         {isMobile && (
           <Drawer
             variant="temporary"
@@ -291,128 +175,20 @@ const MenuPreview: React.FC = () => {
               },
             }}
           >
-            {menuContent}
+            {/* Pass the mobile-filtered menu structure for the drawer */}
+            <MenuSidebar
+              menuItems={mobileVisibleItems} 
+              isLoading={isLoading}
+              expandedItems={expandedItems}
+              toggleExpand={toggleExpand}
+              handleMenuClick={handleMenuClick}
+            />
           </Drawer>
         )}
 
-        {/* Main Content Area */}
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            p: { xs: 2, sm: 3 },
-            backgroundColor: alpha(theme.palette.grey[100], 0.5),
-          }}
-        >
-          <Container maxWidth="lg">
-            <Paper
-              elevation={0}
-              sx={{
-                p: 4,
-                borderRadius: 2,
-                border: `1px solid ${theme.palette.divider}`,
-              }}
-            >
-              <Typography variant="h4" gutterBottom fontWeight={700}>
-                Menu Navigation Preview
-              </Typography>
-              <Divider sx={{ my: 3 }} />
-              
-              <Stack spacing={3}>
-                <Box>
-                  <Typography variant="h6" gutterBottom fontWeight={600}>
-                    About This Preview
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" paragraph>
-                    This is a live preview of your menu structure. The menu is displayed in the
-                    sidebar (or drawer on mobile) and shows how your visitors will navigate your site.
-                  </Typography>
-                </Box>
+        {/* 4. Main Content Area */}
+        <MenuPreviewContent menuItems={menuItems} />
 
-                <Box>
-                  <Typography variant="h6" gutterBottom fontWeight={600}>
-                    Features
-                  </Typography>
-                  <List>
-                    <ListItem>
-                      <ListItemText
-                        primary="Hierarchical Navigation"
-                        secondary="Menu items with children can be expanded/collapsed"
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Mobile Responsive"
-                        secondary="Menu adapts to mobile screens with a drawer interface"
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="External Links"
-                        secondary="Items marked to open in new tabs will do so"
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Mobile Visibility Control"
-                        secondary="Items can be hidden on mobile devices if configured"
-                      />
-                    </ListItem>
-                  </List>
-                </Box>
-
-                <Box>
-                  <Typography variant="h6" gutterBottom fontWeight={600}>
-                    Menu Statistics
-                  </Typography>
-                  <Stack direction="row" spacing={2} flexWrap="wrap">
-                    <Chip
-                      label={`${menuItems.length} Top-level Items`}
-                      color="primary"
-                      sx={{ fontWeight: 600 }}
-                    />
-                    <Chip
-                      label={`${menuItems.reduce(
-                        (acc, item) => acc + (item.children?.length || 0),
-                        0
-                      )} Sub-items`}
-                      color="secondary"
-                      sx={{ fontWeight: 600 }}
-                    />
-                    <Chip
-                      label={`${
-                        menuItems.filter((item) => item.showInMobile).length +
-                        menuItems.reduce(
-                          (acc, item) =>
-                            acc +
-                            (item.children?.filter((c) => c.showInMobile).length || 0),
-                          0
-                        )
-                      } Mobile-visible`}
-                      color="success"
-                      sx={{ fontWeight: 600 }}
-                    />
-                  </Stack>
-                </Box>
-
-                <Box
-                  sx={{
-                    p: 3,
-                    borderRadius: 2,
-                    backgroundColor: alpha(theme.palette.info.main, 0.1),
-                    border: `1px solid ${alpha(theme.palette.info.main, 0.3)}`,
-                  }}
-                >
-                  <Typography variant="body2" color="info.dark">
-                    <strong>Tip:</strong> Try resizing your browser window to see how the menu
-                    adapts between desktop and mobile views. On mobile, use the menu icon in the
-                    top-right corner to open the navigation drawer.
-                  </Typography>
-                </Box>
-              </Stack>
-            </Paper>
-          </Container>
-        </Box>
       </Box>
     </Box>
   );

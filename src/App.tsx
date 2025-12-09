@@ -8,7 +8,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import { store } from "./store";
 import dataProvider from "./providers/dataProvider";
 import authProvider from "./providers/authProvider";
-import CustomLoginPage from "./components/CustomLoginPage";
+import CustomLoginPage from "./components/LoginPage/CustomLoginPage";
 import PagesList from "./resources/pages/PagesList";
 import PagesCreate from "./resources/pages/PagesCreate";
 import PagesEdit from "./resources/pages/PagesEdit";

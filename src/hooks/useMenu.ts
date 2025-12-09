@@ -6,7 +6,10 @@ import type { MenuItem, AddMenuItemInput } from "../types";
 export const useAllMenuItems = () => {
   return useQuery({
     queryKey: ["menu", "items"],
-    queryFn: () => menuApi.getAllItems(),
+    queryFn: async () => {
+      const response = await menuApi.getAllItems();
+      return response.data;
+    },
     staleTime: 30 * 1000, // 30 seconds
   });
 };
@@ -15,7 +18,10 @@ export const useAllMenuItems = () => {
 export const useMenu = (id: number = 1) => {
   return useQuery({
     queryKey: ["menu", id],
-    queryFn: () => menuApi.get(id),
+    queryFn: async () => {
+      const response = await menuApi.get(id);
+      return response.data;
+    },
     staleTime: 30 * 1000, // 30 seconds
   });
 };
@@ -27,8 +33,9 @@ export const useUpdateMenu = () => {
   return useMutation({
     mutationFn: ({ id, items }: { id: number; items: MenuItem[] }) =>
       menuApi.update(id, { items }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["menu", data.id] });
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["menu", response.data.id] });
+      queryClient.invalidateQueries({ queryKey: ["menu", "items"] });
     },
   });
 };
@@ -40,8 +47,9 @@ export const useAddMenuItem = () => {
   return useMutation({
     mutationFn: ({ id, item }: { id: number; item: AddMenuItemInput }) =>
       menuApi.addItem(id, item),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["menu", data.id] });
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["menu", response.data.id] });
+      queryClient.invalidateQueries({ queryKey: ["menu", "items"] });
     },
   });
 };
@@ -53,8 +61,9 @@ export const useReorderMenuItems = () => {
   return useMutation({
     mutationFn: ({ id, itemIds }: { id: number; itemIds: string[] }) =>
       menuApi.reorder(id, { itemIds }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["menu", data.id] });
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["menu", response.data.id] });
+      queryClient.invalidateQueries({ queryKey: ["menu", "items"] });
     },
   });
 };

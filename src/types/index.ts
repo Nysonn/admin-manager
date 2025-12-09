@@ -94,6 +94,7 @@ export interface MenuItem {
 export interface Menu {
   id: number;
   items: MenuItem[];
+  updatedAt?: string;
 }
 
 export interface AddMenuItemInput {

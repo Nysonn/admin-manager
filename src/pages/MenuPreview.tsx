@@ -20,6 +20,7 @@ import {
   Stack,
   Divider,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import {
   ExpandLess,
@@ -30,7 +31,7 @@ import {
   ArrowBack,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useDataProvider } from "react-admin";
+import { useMenu } from "../hooks/useMenu";
 
 type LinkType = "internal" | "external" | "none";
 
@@ -50,29 +51,17 @@ const MenuPreview: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
-  const dataProvider = useDataProvider();
+  const { data: menuData, isLoading: loading, error } = useMenu(1);
   const [menuItems, setMenuItems] = useState<MenuItemType[]>([]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
 
-  // Load menu from data provider
+  // Update menu items when data loads
   useEffect(() => {
-    const loadMenu = async () => {
-      try {
-        setLoading(true);
-        const menuRes = await dataProvider.getOne("menu", { id: 1 });
-        const items: MenuItemType[] = menuRes?.data?.items ? menuRes.data.items : [];
-        setMenuItems(items);
-      } catch (err) {
-        console.error("Failed to load menu:", err);
-        setMenuItems([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadMenu();
-  }, [dataProvider]);
+    if (menuData?.items) {
+      setMenuItems(menuData.items);
+    }
+  }, [menuData]);
 
   const toggleExpand = (id: string) => {
     setExpandedItems((prev) => {
@@ -206,6 +195,41 @@ const MenuPreview: React.FC = () => {
       )}
     </Box>
   );
+
+  // Loading state
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <AppBar position="sticky" elevation={1}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              edge="start"
+              onClick={() => navigate("/menu")}
+              sx={{ mr: 2 }}
+            >
+              <ArrowBack />
+            </IconButton>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Menu Preview
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Container sx={{ mt: 4 }}>
+          <Alert severity="error">Failed to load menu. Please try again.</Alert>
+        </Container>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>

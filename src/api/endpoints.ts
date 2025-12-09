@@ -112,32 +112,32 @@ export const imagesApi = {
 
 // Menu API
 export const menuApi = {
-  getAllItems: async (): Promise<MenuItem[]> => {
-    const { data } = await apiClient.get<MenuItem[]>("/api/menu/items");
-    return data;
+  getAllItems: async (): Promise<{ data: MenuItem[]; total: number }> => {
+    const response = await apiClient.get<{ data: MenuItem[]; total: number }>("/api/menu/items");
+    return response.data;
   },
 
-  get: async (id: number = 1): Promise<Menu> => {
-    const { data } = await apiClient.get<Menu>(`/api/menu/${id}`);
-    return data;
+  get: async (id: number = 1): Promise<{ data: Menu }> => {
+    const response = await apiClient.get<{ data: Menu }>(`/api/menu/${id}`);
+    return response.data;
   },
 
-  update: async (id: number, menu: { items: any[] }): Promise<Menu> => {
-    const { data } = await apiClient.put<Menu>(`/api/menu/${id}`, menu);
-    return data;
+  update: async (id: number, menu: { items: MenuItem[] }): Promise<{ data: Menu }> => {
+    const response = await apiClient.put<{ data: Menu }>(`/api/menu/${id}`, menu);
+    return response.data;
   },
 
-  addItem: async (id: number, item: AddMenuItemInput): Promise<Menu> => {
-    const { data } = await apiClient.post<Menu>(`/api/menu/${id}/items`, item);
-    return data;
+  addItem: async (id: number, item: AddMenuItemInput): Promise<{ data: Menu; newItem: MenuItem }> => {
+    const response = await apiClient.post<{ data: Menu; newItem: MenuItem }>(`/api/menu/${id}/items`, item);
+    return response.data;
   },
 
-  reorder: async (id: number, input: ReorderMenuItemsInput): Promise<Menu> => {
-    const { data } = await apiClient.post<Menu>(
+  reorder: async (id: number, input: ReorderMenuItemsInput): Promise<{ data: Menu }> => {
+    const response = await apiClient.post<{ data: Menu }>(
       `/api/menu/${id}/reorder`,
       input
     );
-    return data;
+    return response.data;
   },
 };
 

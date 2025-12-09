@@ -23,6 +23,8 @@ import {
   Alert,
   Badge,
   Stack,
+  Snackbar,
+  CircularProgress,
 } from "@mui/material";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
@@ -42,8 +44,9 @@ import SmartphoneIcon from "@mui/icons-material/Smartphone";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useDataProvider, useNotify, useRefresh } from "react-admin";
 import { useNavigate } from "react-router-dom";
+import { useMenu, useUpdateMenu } from "../../hooks/useMenu";
+import { usePages } from "../../hooks/usePages";
 
 type LinkType = "internal" | "external" | "none";
 
@@ -145,12 +148,13 @@ const parentIdFromDroppableId = (droppableId: string): string | "root" =>
  * MenuBuilder Component
  */
 const MenuBuilder: React.FC = () => {
-  const dataProvider = useDataProvider();
-  const notify = useNotify();
-  const refresh = useRefresh();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  const { data: menuData, isLoading: menuLoading, error: menuError, refetch } = useMenu(1);
+  const { data: pagesData } = usePages({ page: 1, perPage: 100 });
+  const updateMenuMutation = useUpdateMenu();
 
   const [originalMenu, setOriginalMenu] = useState<MenuItemType[] | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItemType[]>([]);
@@ -158,36 +162,44 @@ const MenuBuilder: React.FC = () => {
   const [pages, setPages] = useState<{ id: number; title: string }[]>([]);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const showSnackbar = (message: string, severity: "success" | "error" | "info" | "warning" = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   // Track unsaved changes
   useEffect(() => {
     setHasUnsavedChanges(JSON.stringify(menuItems) !== JSON.stringify(originalMenu));
   }, [menuItems, originalMenu]);
 
-  // Load menu (single record id=1) and pages for internal links
+  // Load menu from API
   useEffect(() => {
-    (async () => {
-      try {
-        const menuRes = await dataProvider.getOne("menu", { id: 1 });
-        const items: MenuItemType[] = menuRes?.data?.items ? menuRes.data.items : [];
-        setOriginalMenu(deepClone(items));
-        setMenuItems(deepClone(items));
-      } catch (err) {
-        setOriginalMenu([]);
-        setMenuItems([]);
-      }
-      try {
-        const pagesRes = await dataProvider.getList("pages", {
-          pagination: { page: 1, perPage: 100 },
-          sort: { field: "id", order: "ASC" },
-          filter: {},
-        });
-        setPages((pagesRes.data || []).map((p: any) => ({ id: p.id, title: p.title })));
-      } catch (e) {
-        setPages([]);
-      }
-    })();
-  }, [dataProvider]);
+    if (menuData) {
+      const items: MenuItemType[] = menuData.items || [];
+      setOriginalMenu(deepClone(items));
+      setMenuItems(deepClone(items));
+    }
+  }, [menuData]);
+
+  // Load pages from API
+  useEffect(() => {
+    if (pagesData?.data) {
+      setPages(pagesData.data.map((p: any) => ({ id: p.id, title: p.title })));
+    }
+  }, [pagesData]);
 
   // Utility: find an item by id
   const findItem = (items: MenuItemType[], id: string): MenuItemType | undefined => {
@@ -256,16 +268,17 @@ const MenuBuilder: React.FC = () => {
   /** Save all changes (persist whole menu JSON as single record id=1) */
   const saveAll = async () => {
     try {
-      await dataProvider.update("menu", {
-        id: 1, data: { id: 1, items: menuItems },
-        previousData: undefined
+      await updateMenuMutation.mutateAsync({
+        id: 1,
+        items: menuItems,
       });
       setOriginalMenu(deepClone(menuItems));
-      notify("Menu saved", { type: "info" });
-      refresh();
+      showSnackbar("Menu saved successfully!", "success");
+      refetch();
     } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || err?.message || "Failed to save menu";
+      showSnackbar(`Error: ${errorMessage}`, "error");
       console.error(err);
-      notify("Failed to save menu", { type: "warning" });
     }
   };
 
@@ -276,7 +289,7 @@ const MenuBuilder: React.FC = () => {
     if (!ok) return;
     setMenuItems(deepClone(originalMenu));
     setSelectedId(null);
-    notify("Changes discarded", { type: "info" });
+    showSnackbar("Changes discarded", "info");
   };
 
   const toggleExpand = (id: string) => {
@@ -600,6 +613,24 @@ const MenuBuilder: React.FC = () => {
   };
 
   const selectedItem = selectedId ? findItem(menuItems, selectedId) : null;
+
+  // Loading state
+  if (menuLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Error state
+  if (menuError) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">Failed to load menu. Please try again.</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box 
@@ -994,7 +1025,7 @@ const MenuBuilder: React.FC = () => {
               <Button 
                 variant="contained" 
                 startIcon={<CheckCircleIcon />}
-                onClick={() => notify("Item updated. Click 'Save All Changes' to persist.", { type: "info" })}
+                onClick={() => showSnackbar("Item updated. Click 'Save All Changes' to persist.", "info")}
                 fullWidth
                 sx={{
                   borderRadius: 2,
@@ -1025,6 +1056,18 @@ const MenuBuilder: React.FC = () => {
           </Box>
         )}
       </Paper>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

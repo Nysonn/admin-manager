@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Paper,
@@ -30,6 +30,7 @@ import {
   alpha,
   useTheme,
   useMediaQuery,
+  Snackbar,
 } from "@mui/material";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
@@ -46,7 +47,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { useAllMenuItems, useUpdateMenu, useAddMenuItem, useReorderMenuItems } from "../../hooks/useMenu";
 import { usePages } from "../../hooks/usePages";
-import type { MenuItem } from "../../types";
+import type { MenuItem, AddMenuItemInput } from "../../types";
 
 const MenuList: React.FC = () => {
   const theme = useTheme();
@@ -62,6 +63,15 @@ const MenuList: React.FC = () => {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<MenuItem | null>(null);
   const [localItems, setLocalItems] = useState<MenuItem[]>([]);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const pages = pagesData?.data || [];
 
@@ -71,6 +81,14 @@ const MenuList: React.FC = () => {
       setLocalItems(menuItems);
     }
   }, [menuItems]);
+
+  const showSnackbar = (message: string, severity: "success" | "error" | "info" | "warning" = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const [formData, setFormData] = useState<Partial<MenuItem>>({
     label: "",
@@ -116,21 +134,42 @@ const MenuList: React.FC = () => {
         items: updatedItems,
       });
       setEditDialogOpen(false);
+      showSnackbar(`Menu item "${formData.label}" updated successfully!`, "success");
       refetch();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to update menu item";
+      showSnackbar(`Error: ${errorMessage}`, "error");
       console.error("Failed to update menu item:", error);
     }
   };
 
   const handleSaveAdd = async () => {
+    if (!formData.label) {
+      showSnackbar("Please enter a label for the menu item", "warning");
+      return;
+    }
+
+    if (formData.linkType === "external" && !formData.url) {
+      showSnackbar("Please enter a URL for the external link", "warning");
+      return;
+    }
+
+    if (formData.linkType === "internal" && !formData.pageId) {
+      showSnackbar("Please select a page for the internal link", "warning");
+      return;
+    }
+
     try {
-      await addMenuItemMutation.mutateAsync({
+      const response = await addMenuItemMutation.mutateAsync({
         id: 1,
-        item: formData as any,
+        item: formData as AddMenuItemInput,
       });
       setAddDialogOpen(false);
+      showSnackbar(`Menu item "${response.newItem.label}" added successfully!`, "success");
       refetch();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to add menu item";
+      showSnackbar(`Error: ${errorMessage}`, "error");
       console.error("Failed to add menu item:", error);
     }
   };
@@ -146,8 +185,11 @@ const MenuList: React.FC = () => {
         id: 1,
         items: updatedItems,
       });
+      showSnackbar(`Menu item "${item.label}" deleted successfully!`, "success");
       refetch();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to delete menu item";
+      showSnackbar(`Error: ${errorMessage}`, "error");
       console.error("Failed to delete menu item:", error);
     }
   };
@@ -167,8 +209,11 @@ const MenuList: React.FC = () => {
         id: 1,
         itemIds: items.map((item) => item.id),
       });
+      showSnackbar("Menu items reordered successfully!", "success");
       refetch();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to reorder menu items";
+      showSnackbar(`Error: ${errorMessage}`, "error");
       console.error("Failed to reorder menu items:", error);
       // Revert on error
       if (menuItems && Array.isArray(menuItems)) {
@@ -633,6 +678,18 @@ const MenuList: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

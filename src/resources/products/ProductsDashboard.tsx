@@ -20,8 +20,6 @@ import {
   DialogActions,
   CircularProgress,
   Skeleton,
-  IconButton,
-  Tooltip,
   Stack,
   Divider,
   useTheme,
@@ -29,7 +27,6 @@ import {
   alpha,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import CategoryIcon from "@mui/icons-material/Category";
 import SearchIcon from "@mui/icons-material/Search";
@@ -420,7 +417,6 @@ export default function ProductsDashboard() {
                 <TableCell sx={{ fontWeight: 700, color: 'primary.main', textTransform: 'uppercase', fontSize: '0.8125rem', letterSpacing: '0.05em' }}>Price</TableCell>
                 {!isMobile && <TableCell sx={{ fontWeight: 700, color: 'primary.main', textTransform: 'uppercase', fontSize: '0.8125rem', letterSpacing: '0.05em' }}>Category</TableCell>}
                 {!isMobile && <TableCell sx={{ fontWeight: 700, color: 'primary.main', textTransform: 'uppercase', fontSize: '0.8125rem', letterSpacing: '0.05em' }}>Stock</TableCell>}
-                <TableCell sx={{ fontWeight: 700, color: 'primary.main', textTransform: 'uppercase', fontSize: '0.8125rem', letterSpacing: '0.05em' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
 
@@ -453,9 +449,6 @@ export default function ProductsDashboard() {
                           </TableCell>
                         </>
                       )}
-                      <TableCell>
-                        <Skeleton width={80} />
-                      </TableCell>
                     </TableRow>
                   ))
                 : isError
@@ -578,25 +571,6 @@ export default function ProductsDashboard() {
                           </TableCell>
                         </>
                       )}
-
-                      <TableCell sx={{ py: 2 }}>
-                        <Tooltip title="View details" arrow>
-                          <IconButton
-                            size="small"
-                            onClick={() => setSelectedProductId(p.id)}
-                            sx={{
-                              color: 'primary.main',
-                              transition: 'all 0.2s ease',
-                              '&:hover': {
-                                backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                                transform: 'scale(1.1)',
-                              },
-                            }}
-                          >
-                            <OpenInNewIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
                     </TableRow>
                   ))}
             </TableBody>

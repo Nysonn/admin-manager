@@ -4,6 +4,7 @@ import {
   TextInput,
   SelectInput,
   useRecordContext,
+  useEditContext,
 } from "react-admin";
 import { 
   Box, 
@@ -16,6 +17,7 @@ import {
   useTheme,
   useMediaQuery,
   alpha,
+  Skeleton,
 } from "@mui/material";
 import { 
   Info as InfoIcon,
@@ -29,14 +31,109 @@ const statusChoices = [
   { id: "published", name: "Published" },
 ];
 
-const validateRequired = (v: any) => (v ? undefined : "Required");
+const validateRequired = (v: string | undefined) => (v ? undefined : "Required");
 
 const PageEditFormLayout: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const record = useRecordContext();
+  const { isLoading } = useEditContext();
   
   const currentId = record?.id;
+
+  if (isLoading) {
+    return (
+      <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 2, sm: 3 } }}>
+        {/* Header Skeleton */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 2.5, sm: 3 },
+            mb: 3,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: 'divider',
+            backgroundColor: alpha(theme.palette.primary.main, 0.04),
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+            <Skeleton variant="text" width={150} height={40} />
+            <Skeleton variant="rounded" width={80} height={28} sx={{ borderRadius: 2 }} />
+          </Box>
+          <Skeleton variant="text" width="70%" height={20} />
+        </Paper>
+
+        {/* Alert Skeleton */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Skeleton variant="text" width={120} height={24} sx={{ mb: 1 }} />
+          <Skeleton variant="text" width="100%" height={20} />
+          <Skeleton variant="text" width="90%" height={20} />
+          <Skeleton variant="text" width="85%" height={20} />
+        </Paper>
+
+        {/* Form Skeleton */}
+        <Paper
+          elevation={0}
+          sx={{
+            borderRadius: 2,
+            overflow: 'hidden',
+            border: '1px solid',
+            borderColor: 'divider',
+            p: { xs: 2, sm: 3 },
+          }}
+        >
+          {/* Basic Information Section */}
+          <Box sx={{ mb: 4 }}>
+            <Skeleton variant="text" width={180} height={32} sx={{ mb: 2 }} />
+            <Divider sx={{ mb: 3 }} />
+            
+            <Stack spacing={3}>
+              <Box>
+                <Skeleton variant="text" width={100} height={20} sx={{ mb: 1 }} />
+                <Skeleton variant="rounded" width="100%" height={56} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="text" width={200} height={18} sx={{ mt: 0.5 }} />
+              </Box>
+              <Box>
+                <Skeleton variant="text" width={80} height={20} sx={{ mb: 1 }} />
+                <Skeleton variant="rounded" width="100%" height={56} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="text" width={250} height={18} sx={{ mt: 0.5 }} />
+              </Box>
+              <Box>
+                <Skeleton variant="text" width={90} height={20} sx={{ mb: 1 }} />
+                <Skeleton variant="rounded" width="100%" height={56} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="text" width={220} height={18} sx={{ mt: 0.5 }} />
+              </Box>
+            </Stack>
+          </Box>
+
+          {/* Content Section */}
+          <Box>
+            <Skeleton variant="text" width={150} height={32} sx={{ mb: 2 }} />
+            <Divider sx={{ mb: 3 }} />
+            <Skeleton variant="rounded" width="100%" height={300} sx={{ borderRadius: 2 }} />
+          </Box>
+
+          {/* Toolbar Skeleton */}
+          <Box sx={{ display: 'flex', gap: 2, mt: 3, justifyContent: 'space-between' }}>
+            <Skeleton variant="rounded" width={100} height={40} sx={{ borderRadius: 2 }} />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Skeleton variant="rounded" width={100} height={40} sx={{ borderRadius: 2 }} />
+              <Skeleton variant="rounded" width={80} height={40} sx={{ borderRadius: 2 }} />
+            </Box>
+          </Box>
+        </Paper>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 2, sm: 3 } }}>

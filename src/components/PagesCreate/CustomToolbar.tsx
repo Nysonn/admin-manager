@@ -3,7 +3,11 @@ import { Box, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
 // Custom toolbar component with enhanced styling
-const CustomToolbar = (toolbarProps: any) => {
+interface CustomToolbarProps {
+  [key: string]: unknown;
+}
+
+const CustomToolbar: React.FC<CustomToolbarProps> = (toolbarProps) => {
   return (
     <Toolbar 
       {...toolbarProps}

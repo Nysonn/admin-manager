@@ -1,7 +1,11 @@
 import { Filter, TextInput, SelectInput } from "react-admin";
 import { useTheme, alpha } from "@mui/material";
 
-const PageFilters = (props: any) => {
+interface PageFiltersProps {
+  [key: string]: unknown;
+}
+
+const PageFilters: React.FC<PageFiltersProps> = (props) => {
   const theme = useTheme();
   
   // Define common styles for input fields

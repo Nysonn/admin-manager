@@ -20,9 +20,11 @@ import AspectRatioIcon from "@mui/icons-material/AspectRatio";
 import StorageIcon from "@mui/icons-material/Storage";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import type { ImagePreviewDialogProps } from "./types";
+import { useKeyboardNavigation } from "../../hooks/useAccessibility";
 
 /**
  * Full-screen image preview dialog with navigation
+ * Includes keyboard navigation and accessibility features
  */
 const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
   open,
@@ -40,6 +42,13 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalImages - 1;
 
+  // Keyboard navigation
+  useKeyboardNavigation({
+    onEscape: onClose,
+    onArrowLeft: canGoPrev ? () => onNavigate('prev') : undefined,
+    onArrowRight: canGoNext ? () => onNavigate('next') : undefined,
+  }, open);
+
   return (
     <Dialog
       open={open}
@@ -47,6 +56,8 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
       maxWidth="xl"
       fullWidth
       TransitionComponent={Fade}
+      aria-labelledby="image-preview-title"
+      aria-describedby="image-preview-description"
       PaperProps={{
         sx: {
           borderRadius: 0,
@@ -68,6 +79,7 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
         {/* Close Button */}
         <IconButton
           onClick={onClose}
+          aria-label="Close image preview"
           sx={{
             position: 'absolute',
             top: 24,

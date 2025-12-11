@@ -26,7 +26,7 @@ const statusChoices = [
   { id: "published", name: "Published" },
 ];
 
-const validateRequired = (v: any) => (v ? undefined : "Required");
+const validateRequired = (v: string | undefined) => (v ? undefined : "Required");
 
 const PageCreateFormLayout: React.FC = () => {
     const theme = useTheme();

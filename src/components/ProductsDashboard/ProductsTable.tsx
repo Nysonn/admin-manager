@@ -31,7 +31,6 @@ interface ProductsTableProps {
   total: number;
   page: number;
   setPage: (updater: (p: number) => number) => void;
-  setSelectedProductId: (id: number | null) => void;
 }
 
 const ProductsTable: React.FC<ProductsTableProps> = ({
@@ -43,43 +42,57 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   total,
   page,
   setPage,
-  setSelectedProductId,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-  
-  // Table row click handler to open details modal
-  const handleRowClick = (id: number) => {
-    setSelectedProductId(id);
-  };
 
   const getTableBodyContent = () => {
     if (isLoading) {
-      // show skeleton rows
+      // show professional skeleton rows
       return Array.from({ length: perPage }).map((_, idx) => (
-        <TableRow key={`skeleton-${idx}`} sx={{ '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.02) } }}>
-          <TableCell>
-            <Skeleton variant="rectangular" width={64} height={48} sx={{ borderRadius: 1 }} />
+        <TableRow key={`skeleton-${idx}`}>
+          <TableCell width={80} sx={{ py: 2 }}>
+            <Skeleton 
+              variant="rectangular" 
+              width={64} 
+              height={48} 
+              sx={{ 
+                borderRadius: 1.5,
+                border: '1px solid',
+                borderColor: 'divider',
+              }} 
+            />
           </TableCell>
-          <TableCell>
-            <Skeleton width="60%" />
+          <TableCell sx={{ maxWidth: 240, py: 2 }}>
+            <Skeleton variant="text" width="85%" height={24} sx={{ mb: 0.5 }} />
           </TableCell>
           {!isTablet && (
-            <TableCell>
-              <Skeleton width="90%" />
+            <TableCell sx={{ maxWidth: 360, py: 2 }}>
+              <Skeleton variant="text" width="95%" height={20} sx={{ mb: 0.5 }} />
+              <Skeleton variant="text" width="75%" height={20} />
             </TableCell>
           )}
-          <TableCell>
-            <Skeleton width="40%" />
+          <TableCell sx={{ py: 2 }}>
+            <Skeleton variant="text" width={70} height={28} />
           </TableCell>
           {!isMobile && (
             <>
-              <TableCell>
-                <Skeleton width="50%" />
+              <TableCell sx={{ py: 2 }}>
+                <Skeleton 
+                  variant="rounded" 
+                  width={100} 
+                  height={24} 
+                  sx={{ borderRadius: 1.5 }} 
+                />
               </TableCell>
-              <TableCell>
-                <Skeleton width="40%" />
+              <TableCell sx={{ py: 2 }}>
+                <Skeleton 
+                  variant="rounded" 
+                  width={80} 
+                  height={24} 
+                  sx={{ borderRadius: 1.5 }} 
+                />
               </TableCell>
             </>
           )}
@@ -129,9 +142,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     return products.map((p) => (
       <TableRow 
         key={p.id}
-        onClick={() => handleRowClick(p.id)}
         sx={{
-          cursor: 'pointer',
           transition: 'all 0.2s ease',
           '&:hover': {
             backgroundColor: alpha(theme.palette.primary.main, 0.04),

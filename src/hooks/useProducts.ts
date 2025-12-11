@@ -11,16 +11,6 @@ export const useProducts = (filters?: ProductFilters) => {
   });
 };
 
-// Get single product query
-export const useProduct = (id: number, enabled: boolean = true) => {
-  return useQuery({
-    queryKey: ["products", id],
-    queryFn: () => productsApi.getOne(id),
-    enabled,
-    staleTime: 30 * 1000,
-  });
-};
-
 // Refresh products mutation
 export const useRefreshProducts = () => {
   const queryClient = useQueryClient();

@@ -6,14 +6,12 @@ import type { Product } from "../../types";
 import HeaderSection from "../../components/ProductsDashboard/HeaderSection";
 import FiltersSection from "../../components/ProductsDashboard/FiltersSection";
 import ProductsTable from "../../components/ProductsDashboard/ProductsTable";
-import ProductDetailsModal from "../../components/ProductsDashboard/ProductDetailsModal";
 
 export default function ProductsDashboard() {
   const [page, setPage] = useState(1);
   const [perPage] = useState(12);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
 
   // Compose params for data fetching
   const params = useMemo(
@@ -69,13 +67,6 @@ export default function ProductsDashboard() {
         total={total}
         page={page}
         setPage={setPage}
-        setSelectedProductId={setSelectedProductId}
-      />
-
-      {/* 4. Product Details Modal */}
-      <ProductDetailsModal
-        selectedProductId={selectedProductId}
-        setSelectedProductId={setSelectedProductId}
       />
     </Box>
   );

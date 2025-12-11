@@ -4,6 +4,7 @@ import ImageDetailsDialog from "./ImageDetailsDialog";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import ImageContextMenu from "./ImageContextMenu";
 import type { ImageGalleryLogic } from "./GridBodyLogic";
+import type { ImageRecord } from "./types";
 
 interface ImageDialogsProps {
   logic: ImageGalleryLogic;
@@ -35,7 +36,7 @@ const ImageDialogs: React.FC<ImageDialogsProps> = ({ logic }) => {
     confirmDelete,
   } = logic;
   
-  const currentImageIndex = filteredAndSortedData.findIndex((img: any) => img.id === previewImage?.id);
+  const currentImageIndex = filteredAndSortedData.findIndex((img: ImageRecord) => img.id === previewImage?.id);
 
   return (
     <>

@@ -36,7 +36,7 @@ const MenuDialogs: React.FC<MenuDialogsProps> = ({ state, actions }) => {
   const { setEditDialogOpen, setAddDialogOpen, handleSaveEdit, handleSaveAdd } = actions;
   
   // Handlers to simplify form changes
-  const handleFormChange = (key: keyof typeof formData, value: any) => {
+  const handleFormChange = (key: keyof typeof formData, value: string | number | boolean | null) => {
       actions.setFormData({ ...formData, [key]: value });
   }
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy, Suspense } from "react"; 
 import { Admin, Resource, CustomRoutes } from "react-admin";
 import { Route } from "react-router-dom";
 import { BrowserRouter } from "react-router-dom";
@@ -9,15 +9,21 @@ import { store } from "./store";
 import dataProvider from "./providers/dataProvider";
 import authProvider from "./providers/authProvider";
 import CustomLoginPage from "./components/LoginPage/CustomLoginPage";
-import PagesList from "./resources/pages/PagesList";
-import PagesCreate from "./resources/pages/PagesCreate";
-import PagesEdit from "./resources/pages/PagesEdit";
-import ImagesList from "./resources/images/ImageList";
-import MenuList from "./resources/menu/MenuList";
-import ProductsDashboard from "./resources/products/ProductsDashboard";
-import PagePreview from "./pages/PagePreview";
-import MenuPreview from "./pages/MenuPreview";
+import ErrorBoundary from "./components/ErrorBoundary";
+import Loading from "./components/Loading";
 import { Book as PagesIcon, Collections as ImagesIcon, Menu as MenuIcon, ShoppingCart as ProductsIcon } from "@mui/icons-material";
+
+// --- Pages Resources being lazy loaded ---
+const LazyPagesList = lazy(() => import("./resources/pages/PagesList"));
+const LazyPagesCreate = lazy(() => import("./resources/pages/PagesCreate"));
+const LazyPagesEdit = lazy(() => import("./resources/pages/PagesEdit"));
+const LazyImagesList = lazy(() => import("./resources/images/ImageList"));
+const LazyMenuList = lazy(() => import("./resources/menu/MenuList"));
+const LazyProductsDashboard = lazy(() => import("./resources/products/ProductsDashboard"));
+
+// --- Custom Routes ---
+const LazyPagePreview = lazy(() => import("./pages/PagePreview"));
+const LazyMenuPreview = lazy(() => import("./pages/MenuPreview"));
 
 // Create a query client
 const queryClient = new QueryClient({
@@ -32,28 +38,44 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   return (
-    <ReduxProvider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Admin 
+    <ErrorBoundary>
+      <ReduxProvider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <Admin 
             dataProvider={dataProvider} 
             authProvider={authProvider}
             loginPage={CustomLoginPage}
           >
-            <Resource name="pages" list={PagesList} create={PagesCreate} edit={PagesEdit} icon={PagesIcon} />
-            <Resource name="images" list={ImagesList} icon={ImagesIcon} />
-            <Resource name="menu" list={MenuList} icon={MenuIcon} />
-            <Resource name="products" list={ProductsDashboard} icon={ProductsIcon} />
+            <Resource 
+                name="pages" 
+                list={LazyPagesList} 
+                create={LazyPagesCreate} 
+                edit={LazyPagesEdit} 
+                icon={PagesIcon} 
+            />
+            <Resource name="images" list={LazyImagesList} icon={ImagesIcon} />
+            <Resource name="menu" list={LazyMenuList} icon={MenuIcon} />
+            <Resource name="products" list={LazyProductsDashboard} icon={ProductsIcon} />
 
             <CustomRoutes noLayout>
-              <Route path="/preview/:id" element={<PagePreview />} />
-              <Route path="/menu-preview" element={<MenuPreview />} />
+              <Route path="/preview/:id" element={
+                <Suspense fallback={<Loading />}>
+                  <LazyPagePreview />
+                </Suspense>
+              } />
+              <Route path="/menu-preview" element={
+                <Suspense fallback={<Loading />}>
+                  <LazyMenuPreview />
+                </Suspense>
+              } />
             </CustomRoutes>
           </Admin>
         </BrowserRouter>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ReduxProvider>
+    </ErrorBoundary>
   );
 };
 

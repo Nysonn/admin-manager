@@ -8,14 +8,28 @@ import { createTheme } from "@mui/material/styles";
 // react query for fetching data from an external backend
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Material UI theme config
+// Material UI theme config with proper dark mode
 const theme = createTheme({
   palette: {
+    mode: 'dark', // Enable dark mode
     primary: {
-      main: "#1976d2", 
+      main: "#90caf9", // Better contrast for dark mode
     },
     secondary: {
-      main: "#0288d1",
+      main: "#ce93d8",
+    },
+    background: {
+      default: "#121212", // Consistent dark background
+      paper: "#1e1e1e",   // Slightly lighter for cards/paper
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundColor: "#121212",
+        },
+      },
     },
   },
 });

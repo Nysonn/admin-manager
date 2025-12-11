@@ -12,8 +12,8 @@ import {
     TableContainer,
     alpha,
     useTheme,
-    CircularProgress,
     Alert,
+    Skeleton,
 } from "@mui/material";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import AddIcon from "@mui/icons-material/Add";
@@ -32,9 +32,74 @@ const MenuTable: React.FC<MenuTableProps> = ({ state, actions }) => {
 
     if (isLoading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 400 }}>
-                <CircularProgress />
-            </Box>
+            <Paper
+                elevation={0}
+                sx={{
+                    borderRadius: 3,
+                    overflow: "hidden",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    boxShadow: `0 1px 3px ${alpha("#000", 0.08)}`,
+                }}
+            >
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell sx={{ width: 50, bgcolor: alpha(theme.palette.primary.main, 0.06) }}></TableCell>
+                                <TableCell sx={{ fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.06) }}>
+                                    Label
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.06) }}>
+                                    Type
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.06) }}>
+                                    Link To
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.06) }}>
+                                    URL
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.06) }}>
+                                    Options
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.06), width: 150 }}>
+                                    Actions
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.from({ length: 6 }).map((_, index) => (
+                                <TableRow key={`skeleton-${index}`}>
+                                    <TableCell sx={{ py: 2 }}>
+                                        <Skeleton variant="circular" width={24} height={24} sx={{ mx: 'auto' }} />
+                                    </TableCell>
+                                    <TableCell sx={{ py: 2 }}>
+                                        <Skeleton variant="text" width="80%" height={24} />
+                                    </TableCell>
+                                    <TableCell sx={{ py: 2 }}>
+                                        <Skeleton variant="rounded" width={80} height={28} sx={{ borderRadius: 2 }} />
+                                    </TableCell>
+                                    <TableCell sx={{ py: 2 }}>
+                                        <Skeleton variant="text" width="70%" height={24} />
+                                    </TableCell>
+                                    <TableCell sx={{ py: 2 }}>
+                                        <Skeleton variant="text" width="60%" height={24} />
+                                    </TableCell>
+                                    <TableCell sx={{ py: 2 }}>
+                                        <Skeleton variant="text" width={60} height={24} />
+                                    </TableCell>
+                                    <TableCell sx={{ py: 2 }}>
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            <Skeleton variant="circular" width={32} height={32} />
+                                            <Skeleton variant="circular" width={32} height={32} />
+                                        </Box>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
         );
     }
 

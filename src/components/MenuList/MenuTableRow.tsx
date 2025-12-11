@@ -29,7 +29,7 @@ interface MenuTableRowProps {
     actions: MenuManagementActions;
 }
 
-const MenuTableRow: React.FC<MenuTableRowProps> = ({ item, provided, snapshot, actions }) => {
+const MenuTableRow: React.FC<MenuTableRowProps> = React.memo(({ item, provided, snapshot, actions }) => {
     const theme = useTheme();
 
     return (
@@ -121,6 +121,6 @@ const MenuTableRow: React.FC<MenuTableRowProps> = ({ item, provided, snapshot, a
             </TableCell>
         </TableRow>
     );
-};
+});
 
 export default MenuTableRow;

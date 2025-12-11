@@ -61,7 +61,7 @@ const PagePreview: React.FC = () => {
             filter: {},
           });
           
-          foundPage = allPages.find((p: any) => p.slug === id) as PageData;
+          foundPage = allPages.find((p: PageData) => p.slug === id) as PageData;
         }
         
         if (foundPage) {

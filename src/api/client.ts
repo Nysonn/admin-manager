@@ -7,14 +7,14 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://admin-api-qgh7.on
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // Base delay in ms
 
-// Create axios instance with cookie support for session management
+// Create axios instance for API requests
 const apiClient = axios.create({
   baseURL: BASE_URL,
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Enable cookies for 6-month session cookie
+  withCredentials: false, // Disabled: cross-site cookies not needed (using token auth)
 });
 
 // Request interceptor to add auth token

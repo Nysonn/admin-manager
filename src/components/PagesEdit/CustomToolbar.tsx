@@ -11,7 +11,11 @@ import {
 } from "@mui/icons-material";
 
 // Custom toolbar component with enhanced styling
-const CustomToolbar: React.FC<any> = (toolbarProps) => {
+interface CustomToolbarProps {
+  [key: string]: unknown;
+}
+
+const CustomToolbar: React.FC<CustomToolbarProps> = (toolbarProps) => {
   const record = useRecordContext();
 
   // Guard against missing record (e.g., during initial load)

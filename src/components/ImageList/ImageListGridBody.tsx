@@ -2,15 +2,17 @@ import React from "react";
 import Grid from "@mui/material/Grid";
 import { useListContext } from "react-admin";
 import { useImageGalleryLogic } from "./GridBodyLogic";
+import type { ImageRecord } from "./types";
 import BulkActionsBar from "./BulkActionsBar";
 import EmptyState from "./EmptyState";
 import ImageCard from "./ImageCard"; 
 import ImageDialogs from "./ImageDialogs";
+import ImageCardSkeleton from "./ImageCardSkeleton";
 
 interface ImageListGridBodyProps {}
 
 const ImageListGridBody: React.FC<ImageListGridBodyProps> = () => {
-  const { data } = useListContext();
+  const { data, isLoading } = useListContext();
   const logic = useImageGalleryLogic();
 
   const {
@@ -33,6 +35,19 @@ const ImageListGridBody: React.FC<ImageListGridBodyProps> = () => {
     setSelectedImages,
   } = logic;
 
+  // Loading state - show skeleton grid
+  if (isLoading) {
+    return (
+      <Grid container spacing={{ xs: 2, sm: 3, md: 3 }}>
+        {Array.from({ length: 12 }).map((_, index) => (
+          <Grid key={`skeleton-${index}`} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+            <ImageCardSkeleton />
+          </Grid>
+        ))}
+      </Grid>
+    );
+  }
+
   // Empty states
   if (!data || data.length === 0) {
     return <EmptyState isMobile={isMobile} />;
@@ -52,7 +67,7 @@ const ImageListGridBody: React.FC<ImageListGridBodyProps> = () => {
 
       {/* Professional Image Grid */}
       <Grid container spacing={{ xs: 2, sm: 3, md: 3 }}>
-        {filteredAndSortedData?.map((record: any) => {
+        {filteredAndSortedData?.map((record: ImageRecord) => {
           if (!record) return null;
           const progress = progressMap[record.id] ?? 0;
           const isHovered = hoveredCard === record.id;

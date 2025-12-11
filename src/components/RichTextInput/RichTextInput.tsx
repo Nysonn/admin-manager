@@ -13,7 +13,7 @@ import { RichTextEditorView } from './RichTextEditorView';
 interface RichTextInputProps {
   source: string;
   label?: string;
-  validate?: any;
+  validate?: (value: string) => string | undefined;
   fullWidth?: boolean;
 }
 

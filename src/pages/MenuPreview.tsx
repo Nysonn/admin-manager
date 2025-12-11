@@ -5,9 +5,10 @@ import {
   Drawer,
   useTheme,
   useMediaQuery,
-  CircularProgress,
   Alert,
   Container,
+  Skeleton,
+  Stack,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useMenu } from "../hooks/useMenu";
@@ -110,8 +111,66 @@ const MenuPreview: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-        <CircularProgress />
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        {/* Header Skeleton */}
+        <Paper
+          elevation={1}
+          sx={{
+            borderRadius: 0,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            px: { xs: 2, sm: 3 },
+            py: 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Skeleton variant="circular" width={40} height={40} />
+              <Skeleton variant="text" width={120} height={32} />
+            </Box>
+            <Skeleton variant="rounded" width={100} height={36} sx={{ borderRadius: 2 }} />
+          </Box>
+        </Paper>
+
+        <Box sx={{ display: "flex", flex: 1 }}>
+          {/* Sidebar Skeleton */}
+          {!isMobile && (
+            <Paper
+              elevation={2}
+              sx={{
+                width: 280,
+                borderRadius: 0,
+                borderRight: `1px solid ${theme.palette.divider}`,
+                p: 3,
+              }}
+            >
+              <Stack spacing={2}>
+                <Skeleton variant="text" width="60%" height={28} />
+                <Skeleton variant="rounded" width="100%" height={40} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="rounded" width="100%" height={40} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="rounded" width="100%" height={40} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="text" width="50%" height={28} sx={{ mt: 2 }} />
+                <Skeleton variant="rounded" width="100%" height={40} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="rounded" width="100%" height={40} sx={{ borderRadius: 2 }} />
+              </Stack>
+            </Paper>
+          )}
+
+          {/* Content Skeleton */}
+          <Box sx={{ flex: 1, p: { xs: 2, sm: 4 } }}>
+            <Container maxWidth="lg">
+              <Skeleton variant="text" width="40%" height={48} sx={{ mb: 3 }} />
+              <Paper sx={{ p: 4, borderRadius: 3 }}>
+                <Skeleton variant="text" width="30%" height={32} sx={{ mb: 2 }} />
+                <Skeleton variant="text" width="100%" height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="95%" height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="85%" height={24} sx={{ mb: 3 }} />
+                <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: 2, mb: 3 }} />
+                <Skeleton variant="text" width="100%" height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="90%" height={24} />
+              </Paper>
+            </Container>
+          </Box>
+        </Box>
       </Box>
     );
   }

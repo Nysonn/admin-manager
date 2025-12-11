@@ -6,6 +6,7 @@ import {
   useRefresh,
 } from "react-admin";
 import { useMediaQuery, useTheme } from "@mui/material";
+import type { ImageRecord } from "./types";
 
 export const useImageGalleryLogic = () => {
   const { data } = useListContext();
@@ -19,12 +20,12 @@ export const useImageGalleryLogic = () => {
   const [progressMap, setProgressMap] = useState<Record<number | string, number>>({});
   const [hoveredCard, setHoveredCard] = useState<number | string | null>(null);
   const [selectedImages, setSelectedImages] = useState<Set<number | string>>(new Set());
-  const [previewImage, setPreviewImage] = useState<any | null>(null);
-  const [imageDetails, setImageDetails] = useState<any | null>(null);
+  const [previewImage, setPreviewImage] = useState<ImageRecord | null>(null);
+  const [imageDetails, setImageDetails] = useState<ImageRecord | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuImage, setMenuImage] = useState<any | null>(null);
+  const [menuImage, setMenuImage] = useState<ImageRecord | null>(null);
   const [copyFeedback, setCopyFeedback] = useState<Record<string, boolean>>({});
-  const [editingFilename, setEditingFilename] = useState<string | null>(null);
+  const [editingFilename, setEditingFilename] = useState<number | string | null>(null);
   const [tempFilename, setTempFilename] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
@@ -40,7 +41,7 @@ export const useImageGalleryLogic = () => {
 
   const currentImageIndex = useMemo(() => {
     if (!previewImage || !filteredAndSortedData) return -1;
-    return filteredAndSortedData.findIndex((img: any) => img.id === previewImage.id);
+    return filteredAndSortedData.findIndex((img: ImageRecord) => img.id === previewImage.id);
   }, [previewImage, filteredAndSortedData]);
 
   // --- Handlers ---

@@ -1,10 +1,6 @@
 import React from "react";
 import {
   List,
-  Datagrid,
-  TextField,
-  FunctionField,
-  DateField,
 } from "react-admin";
 import { 
   Box, 
@@ -19,7 +15,7 @@ import {
 } from "@mui/icons-material";
 import PageFilters from "./PageFilters";
 import ListActions from "./ListActions";
-import { StatusField, TitleLinkField, ActionButtons } from "./DataGridFields";
+import PagesTableWithSkeleton from "./PagesTableWithSkeleton";
 
 const PagesListLayout: React.FC<any> = (props) => {
   const theme = useTheme();
@@ -94,79 +90,7 @@ const PagesListLayout: React.FC<any> = (props) => {
           },
         }}
       >
-        <Datagrid 
-          bulkActionButtons={false} 
-          rowClick={false}
-          sx={{
-            '& .RaDatagrid-headerCell': {
-              backgroundColor: alpha(theme.palette.primary.main, 0.06),
-              fontWeight: 700,
-              fontSize: '0.8125rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              color: 'primary.main',
-              borderBottom: '2px solid',
-              borderColor: 'primary.main',
-              py: 2.5,
-            },
-            '& .RaDatagrid-row': {
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                transform: 'scale(1.001)',
-              },
-            },
-            '& .RaDatagrid-rowCell': {
-              borderBottom: '1px solid',
-              borderColor: alpha('#000', 0.06),
-              py: 2.5,
-              px: 2,
-            },
-          }}
-        >
-          <FunctionField 
-            label="Title" 
-            render={() => <TitleLinkField />}
-            sx={{ minWidth: isMobile ? 150 : 250 }}
-          />
-          {!isMobile && (
-            <TextField 
-              source="slug" 
-              sx={{ 
-                color: 'text.secondary',
-                fontFamily: 'monospace',
-                fontSize: '0.8125rem',
-                fontWeight: 500,
-                backgroundColor: alpha('#000', 0.02),
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 1,
-                display: 'inline-block',
-              }} 
-            />
-          )}
-          <FunctionField 
-            label="Status" 
-            render={() => <StatusField />}
-          />
-          {!isMobile && (
-            <DateField 
-              source="createdAt" 
-              label="Created"
-              showTime={false}
-              sx={{ 
-                color: 'text.secondary', 
-                fontSize: '0.8125rem',
-                fontWeight: 500,
-              }}
-            />
-          )}
-          <FunctionField 
-            label="Actions" 
-            render={() => <ActionButtons />}
-            textAlign="right"
-          />
-        </Datagrid>
+        <PagesTableWithSkeleton />
       </List>
     </Box>
   );

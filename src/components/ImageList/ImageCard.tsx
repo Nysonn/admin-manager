@@ -30,8 +30,9 @@ import type { ImageCardProps } from "./types";
 
 /**
  * Individual image card component with thumbnail and actions
+ * Memoized to prevent unnecessary re-renders
  */
-const ImageCard: React.FC<ImageCardProps> = ({
+const ImageCard: React.FC<ImageCardProps> = React.memo(({
   record,
   progress,
   isHovered,
@@ -90,6 +91,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
         onChange={() => onSelect(record.id)}
         icon={<CheckBoxOutlineBlankIcon />}
         checkedIcon={<CheckBoxIcon />}
+        inputProps={{ 'aria-label': `Select image ${record.filename}` }}
         sx={{
           position: 'absolute',
           top: 8,
@@ -372,6 +374,6 @@ const ImageCard: React.FC<ImageCardProps> = ({
       </CardContent>
     </Card>
   );
-};
+});
 
 export default ImageCard;

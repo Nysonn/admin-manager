@@ -41,12 +41,14 @@ const ImageUploadItemRenderer: React.FC<ImageUploadItemRendererProps> = ({ logic
         {items.map((it, index) => (
           <Grid key={it.previewUrl} size={{xs:12, sm:6, md:4, lg:3}}>
             <Fade in timeout={300 + index * 100}>
-              <UploadItemCard 
-                item={it} 
-                kb={kb} 
-                removeItem={removeItem} 
-                index={index}
-              />
+              <Box>
+                <UploadItemCard 
+                  item={it} 
+                  kb={kb} 
+                  removeItem={removeItem} 
+                  index={index}
+                />
+              </Box>
             </Fade>
           </Grid>
         ))}

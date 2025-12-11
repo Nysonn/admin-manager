@@ -29,11 +29,6 @@ const CustomToolbar: React.FC<CustomToolbarProps> = (toolbarProps) => {
         </Typography>
       </Box>
       <SaveButton 
-        mutationOptions={{
-          onSuccess: () => {
-            // Will use the redirect from Create component
-          }
-        }}
         sx={{
           borderRadius: 2,
           px: 3,

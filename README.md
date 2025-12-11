@@ -18,7 +18,7 @@ Password: admin123
 
 #### 1. Page Management
 - ✅ Create, edit, delete, and list pages
-- ✅ Rich text editor for content creation
+- ✅ Multi-line text editor for content creation
 - ✅ Page fields: Title, Slug, Content, Publication Status (draft/published)
 - ✅ Slug validation to prevent duplicates
 - ✅ Live page preview functionality
@@ -77,7 +77,7 @@ Password: admin123
 
 ### Form Handling & Validation
 - **React Hook Form** - Form state management
-- **TiTap** - Rich text editor for page content
+- **Material-UI TextField** - Multi-line text input for page content
 
 ### Routing & Navigation
 - **React Router** - Client-side routing
@@ -153,7 +153,7 @@ admin-manager/
 │   │   ├── PagesEdit/         # Page editing components
 │   │   ├── ProductsDashboard/ # Products display components
 │   │   ├── Layout/            # Layout components
-│   │   └── RichTextInput/     # Rich text editor wrapper
+│   │   └── RichTextInput/     # Multi-line text input wrapper
 │   │
 │   ├── hooks/                 # Custom React hooks
 │   │   ├── useAuth.ts         # Authentication hook

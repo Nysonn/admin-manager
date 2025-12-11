@@ -10,7 +10,7 @@ export const useAllMenuItems = () => {
       const response = await menuApi.getAllItems();
       return response.data;
     },
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -22,7 +22,7 @@ export const useMenu = (id: number = 1) => {
       const response = await menuApi.get(id);
       return response.data;
     },
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 

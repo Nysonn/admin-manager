@@ -151,7 +151,6 @@ export const useMenuManagement = () => {
       });
       setEditDialogOpen(false);
       showSnackbar(`Menu item "${formData.label}" updated successfully!`, "success");
-      refetch();
     } catch (error: any) {
       showSnackbar(`Error: ${extractErrorMessage(error)}`, "error");
       console.error("Failed to update menu item:", error);
@@ -181,7 +180,6 @@ export const useMenuManagement = () => {
       });
       setAddDialogOpen(false);
       showSnackbar(`Menu item "${response.newItem.label}" added successfully!`, "success");
-      refetch();
     } catch (error: any) {
       showSnackbar(`Error: ${extractErrorMessage(error)}`, "error");
       console.error("Failed to add menu item:", error);
@@ -200,7 +198,6 @@ export const useMenuManagement = () => {
         items: updatedItems,
       });
       showSnackbar(`Menu item "${item.label}" deleted successfully!`, "success");
-      refetch();
     } catch (error: any) {
       showSnackbar(`Error: ${extractErrorMessage(error)}`, "error");
       console.error("Failed to delete menu item:", error);
@@ -226,7 +223,6 @@ export const useMenuManagement = () => {
         itemIds: items.map((item) => item.id),
       });
       showSnackbar("Menu items reordered successfully!", "success");
-      refetch(); // Final refresh
     } catch (error: any) {
       showSnackbar(`Error: ${extractErrorMessage(error)}`, "error");
       console.error("Failed to reorder menu items:", error);

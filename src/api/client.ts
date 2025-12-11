@@ -4,8 +4,8 @@ import type { AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://admin-api-qgh7.onrender.com";
 
 // Retry configuration
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // Base delay in ms
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 2000; // Base delay in ms (increased for better rate limit handling)
 
 // Create axios instance for API requests
 const apiClient = axios.create({
